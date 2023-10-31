@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Describing behavior, properties/attributes and activity of the app -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,12 +18,15 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TimeOutApp">
+
+            <!-- Actions to be able to access internet and connecting to NTP server -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.permission.INTERNET" />
+                <action android:name="android.permission.ACCESS_NETWORK_STATE" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
