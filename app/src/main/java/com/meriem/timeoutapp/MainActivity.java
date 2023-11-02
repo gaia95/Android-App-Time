@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
             private Date getSystemTime(){
 
-
                 // creating Date object to be able to get and return time
                 Date time = new Date();
                 time.setTime(time.getTime() + offset);
