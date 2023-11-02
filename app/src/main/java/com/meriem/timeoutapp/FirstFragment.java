@@ -14,7 +14,6 @@ import com.meriem.timeoutapp.databinding.FragmentFirstBinding;
 public class FirstFragment extends Fragment {
 
     private FragmentFirstBinding binding;
-
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -34,7 +33,6 @@ public class FirstFragment extends Fragment {
             public void onClick(View view) {
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigateUp();
-
             }
         });
     }
