@@ -15,22 +15,21 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import java.net.InetAddress;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
-
-   // private long systemTime = 0;
    long offset = 0; // to be able to adjust time in case of network delay
 
     @Override
+    // What the layout will contain
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -47,52 +46,47 @@ public class MainActivity extends AppCompatActivity {
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
 
-            private void getSystemTime(){
+            private Date getSystemTime(){
 
+
+                // creating Date object to be able to get and return time
                 Date time = new Date();
                 time.setTime(time.getTime() + offset);
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(time);
+                // TextView text1.setText("System time: " + time);
 
-                int hours = cal.get(Calendar.HOUR_OF_DAY);
-                int minutes = cal.get(Calendar.MINUTE);
-                int seconds = cal.get(Calendar.SECOND);
-                // Field for the time
-                final TextView textView = findViewById(R.id.textview_second);
-
-                // Sending information to the text field display on app
-                String currentTime = hours + ":" + minutes + ":" + seconds;
-                textView.setTextSize(75);
-                textView.setText(currentTime);
-
+                return time;
             }
 
             private Date getNetworkTime(){
 
-
                 NTPUDPClient timeClient = new NTPUDPClient();
                 timeClient.setDefaultTimeout(2000);
 
-                // Get network time if possible, else continue with system time
+                // Get network time from ntp server if possible, else fallback with system time
 
                 try {
 
+                    // Communicating with and getting information from server
                     InetAddress ntpServer = InetAddress.getByName("1.se.pool.ntp.org");
                     TimeInfo timeInfo = timeClient.getTime(ntpServer);
                     long ntpTime = timeInfo.getMessage().getTransmitTimeStamp().getTime();
+
+                    // Creating an object for saving gathered time info +
+                    // printing out to terminal and returning the time
                     Date date = new Date(ntpTime);
                     System.out.println("Returning time from NTPServer: " + date);
                     return date;
 
                 } catch (Exception e){
 
-                    // msg to terminal
+                    // msg to terminal and calling system time method to run instead
                     System.out.println("!NETWORK ERROR! Returning system time from device: ");
-                    getSystemTime();
-                    e.printStackTrace();
+                    Date systemTime = getSystemTime();
+                    e.printStackTrace(); // For easier debugging
 
-                    return new Date();
+                    return systemTime;
+
                 }
             }
 
@@ -104,22 +98,38 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
 
+                        // Referring to text field where info will be displayed and method call
                         final TextView text1 = (TextView) findViewById(R.id.textview_first);
                         Date netTime = getNetworkTime();
-                        netTime.setTime(netTime.getTime() + offset);
 
-                                //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                        // Controlling if network time was successfully collected or not
+                        if(netTime != null) {
 
-                        DateFormat timeFormat = DateFormat.getTimeInstance();
-                        String current = timeFormat.format(netTime);
-                        text1.setText(current);
+                            netTime.setTime(netTime.getTime() + offset);
+                            //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                            DateFormat timeFormat = DateFormat.getTimeInstance();
+                            String current = timeFormat.format(netTime);
+                            text1.setText(current);
+
+                        } else {
+
+                            // network time fail, show system time
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Date systemTime = getSystemTime();
+                                    DateFormat timeFormat = DateFormat.getTimeInstance();
+                                    String currentTime = timeFormat.format(systemTime);
+                                    text1.setText(currentTime);
+                                }
+                            });
+                        }
                     }
                 }).start();
             }
         });
     }
 
-    // ----------------------------######################----------------------------
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,9 +140,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
