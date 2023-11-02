@@ -19,5 +19,4 @@ The application has the ability to connect to a NTP(Network Time Protocol) serve
                     -----  System Time  ------
 If the collection of network time fails, the app instead displays the time within the devices system.
 
-
-
+To view the project head over to the master branch.
