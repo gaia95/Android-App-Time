@@ -14,7 +14,7 @@
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/textview_first"
